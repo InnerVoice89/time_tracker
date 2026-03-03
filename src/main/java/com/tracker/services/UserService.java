@@ -1,7 +1,7 @@
 package com.tracker.services;
 
 import com.tracker.dao.UserDao;
-import com.tracker.models.User;
+import com.tracker.dto.User;
 import lombok.RequiredArgsConstructor;
 
 import javax.sql.DataSource;
@@ -16,10 +16,9 @@ public class UserService {
 
     public User findUserByUsername(String username) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
-              return userDao.findUserByUsername(username,connection);
-            }
+            return userDao.findUserByUsername(username, connection);
         }
-
     }
+}
 
 

@@ -1,10 +1,10 @@
 package com.tracker;
 
-import com.tracker.models.User;
+import com.tracker.dto.User;
 
 public class UserContext {
 
-    private static final ThreadLocal<User> authUser = new ThreadLocal<>(); //!!!Очистить!!!
+    private static final ThreadLocal<User> authUser = new ThreadLocal<>();
 
     public static User getUser() {
         return authUser.get();

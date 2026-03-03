@@ -1,16 +1,16 @@
 package com.tracker.services;
 
-import com.tracker.dto.RequestDto;
-import com.tracker.dto.ResponseInfoByTask;
+import com.tracker.dto.RequestTaskDto;
+import com.tracker.dto.TaskInfo;
 
 import java.sql.SQLException;
 
 public interface TaskService {
 
-    long startTask(RequestDto request) throws SQLException;
+    long startTask(RequestTaskDto request) throws SQLException;
 
     void endTask(long id) throws SQLException;
 
-    ResponseInfoByTask showInfoTask(RequestDto request) throws SQLException;
+    TaskInfo showTaskById(RequestTaskDto request) throws SQLException;
 
 }

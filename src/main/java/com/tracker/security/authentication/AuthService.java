@@ -1,10 +1,12 @@
 package com.tracker.security.authentication;
 
 
-import com.tracker.models.User;
+import com.tracker.dto.User;
+import com.tracker.exceptions.SecurityException;
 import com.tracker.security.PasswordEncoder;
 import com.tracker.services.UserService;
 import lombok.RequiredArgsConstructor;
+
 import java.sql.SQLException;
 
 @RequiredArgsConstructor
@@ -14,14 +16,13 @@ public class AuthService {
 
     public User authenticate(String username, String password) throws SQLException {
 
-            User user = userService.findUserByUsername(username);
-            if (user == null)
-                throw new RuntimeException("Пользователь не найден");
-            String encodedPassword = PasswordEncoder.hash(password);
-            if (!PasswordEncoder.matches(encodedPassword, user.getPassword()))
-                return null;
-            user.setPassword(null);
-            return user;
+        User user = userService.findUserByUsername(username);
+        if (user == null)
+            throw new RuntimeException("Пользователь не найден");
+        if (!PasswordEncoder.matches(password, user.getPassword()))
+            throw new SecurityException("Пароли не совпадают");
+        user.setPassword(null);
+        return user;
 
     }
 }

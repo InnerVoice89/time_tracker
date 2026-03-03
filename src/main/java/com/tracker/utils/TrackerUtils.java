@@ -1,9 +1,8 @@
 package com.tracker.utils;
 
 
-import com.tracker.dto.ResponseInfoByTask;
-import com.tracker.models.TaskEntity;
-import com.tracker.models.User;
+import com.tracker.dto.TaskInfo;
+import com.tracker.dto.TaskEntity;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -13,7 +12,6 @@ import java.time.ZoneId;
 public class TrackerUtils {
 
     public static String correctDuration(Duration duration) {
-
         if (duration.isNegative() || duration.isZero())
             throw new RuntimeException("Некорректная продолжительность работы");
 
@@ -27,22 +25,24 @@ public class TrackerUtils {
         long seconds = duration.getSeconds() % 3600 % 60;
         if (seconds > 0)
             sb.append(seconds).append("sec");
-
         return sb.toString();
 
     }
+
     public static OffsetDateTime convertInstantToOffsetDT(Instant instant, String zoneId) {
         return instant.atZone(ZoneId.of(zoneId)).toOffsetDateTime();
-
     }
 
-    public static ResponseInfoByTask toResponseDto(TaskEntity entity, User user) {
+    public static TaskInfo toResponseDto(TaskEntity entity, String timeZone) {
         Duration duration = Duration.between(entity.getTaskStart(), entity.getTaskEnd());
-        return new ResponseInfoByTask(entity.getTaskName()
-                , convertInstantToOffsetDT(entity.getTaskStart(), user.getTimeZone())
-                , convertInstantToOffsetDT(entity.getTaskEnd(), user.getTimeZone())
-                , correctDuration(duration), null
-        );
+        return TaskInfo.builder()
+                .id(entity.getId())
+                .taskName(entity.getTaskName())
+                .startTime(convertInstantToOffsetDT(entity.getTaskStart(), timeZone))
+                .endTime(convertInstantToOffsetDT(entity.getTaskEnd(), timeZone))
+                .duration(correctDuration(duration))
+                .userId(entity.getUserId())
+                .build();
 
     }
 }

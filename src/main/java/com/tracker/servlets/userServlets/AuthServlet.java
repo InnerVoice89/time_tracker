@@ -1,9 +1,9 @@
-package com.tracker.servlets;
+package com.tracker.servlets.userServlets;
 
-import com.tracker.models.User;
-import com.tracker.security.authentication.AuthService;
+import com.tracker.dto.User;
+import com.tracker.servlets.AbstractInitServlet;
+import com.tracker.utils.ResponseUtils;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -13,9 +13,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @WebServlet("/auth")
-public class AuthServlet extends HttpServlet {
-
-    private final AuthService authService;
+public class AuthServlet extends AbstractInitServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -27,8 +25,8 @@ public class AuthServlet extends HttpServlet {
         try {
             user = authService.authenticate(username, password);
         } catch (Exception ex) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().write("Некорректные данные. "+ex.getMessage());
+            ResponseUtils.errorResponse(resp, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Некорректные данные. " + ex.getMessage());
             return;
         }
         HttpSession session = req.getSession(true);

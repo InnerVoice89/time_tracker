@@ -1,20 +1,18 @@
-package com.tracker.models;
+package com.tracker.dto;
 
-import com.tracker.dto.Role;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 public class User {
 
-    private long id;
+    private Long id;
     private String username;
     private String password;
     private String timeZone;
     private Set<Role> roles;
-
-
 }
