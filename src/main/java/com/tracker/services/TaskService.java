@@ -1,16 +1,25 @@
 package com.tracker.services;
 
-import com.tracker.dto.RequestTaskDto;
-import com.tracker.dto.TaskInfo;
+import com.tracker.dto.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public interface TaskService {
 
-    long startTask(RequestTaskDto request) throws SQLException;
+    long startTask(String taskName) throws SQLException;
 
     void endTask(long id) throws SQLException;
 
-    TaskInfo showTaskById(RequestTaskDto request) throws SQLException;
+    ShowTaskInfoRs showTasksById(long taskId) throws SQLException;
 
+    ShowTaskInfoRs getTasksByUserId(long id) throws SQLException;
+
+    ShowTaskInfoRs findTasksInPeriod(TasksInPeriodRq request) throws SQLException;
+
+    void cleanAllTasksByUserId(long id) throws SQLException;
+
+    void putPauseResume(long taskId) throws SQLException;
+
+    void deleteTaskByTaskId(long taskId) throws SQLException;
 }

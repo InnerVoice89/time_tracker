@@ -20,25 +20,26 @@ public class ApplicationManager {
 
     private final DataSource dataSource;
     private final SchedulerManager schedulerManager;
-    private final Properties properties;
     private final AdminService adminService;
     private final UserService userService;
     private final UserDao userDao;
     private final AuthService authService;
     private final TaskService taskService;
     private final TaskDao taskDao;
+    private final ConfigLoader configLoader;
 
     public ApplicationManager() {
         ConnectionConfig config = new ConnectionConfig();
-        properties = config.getProperties("application.properties");
-        dataSource = config.dataSource(properties);
+        configLoader = new ConfigLoader("application.properties");
+        dataSource = config.dataSource(configLoader);
         schedulerManager = new SchedulerManager(dataSource);
         userDao = new UserDao();
         adminService = new AdminService(userDao, dataSource);
         userService = new UserService(userDao, dataSource);
         authService = new AuthService(userService);
-        taskDao=new TaskDaoImpl();
-        taskService=new TaskServiceImpl(taskDao,dataSource,userDao);
+        taskDao = new TaskDaoImpl();
+        taskService = new TaskServiceImpl(taskDao, dataSource);
+
     }
 
 

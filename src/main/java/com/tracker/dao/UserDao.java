@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class UserDao {
 
@@ -37,6 +36,7 @@ public class UserDao {
                     user = new User();
                     Set<Role> roles = new HashSet<>();
                     user.setRoles(roles);
+                    user.setId(rs.getLong("id"));
                     user.setUsername(rs.getString("username"));
                     user.setTimeZone(rs.getString("timezone"));
                     user.setPassword(rs.getString("password"));
@@ -61,6 +61,8 @@ public class UserDao {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     long id = rs.getLong(1);
+                    if (user.getRoles() == null)
+                        user.setRoles(Set.of(Role.USER));
                     addRolesToId(user.getRoles(), id, connection);
                 }
             }
@@ -81,7 +83,7 @@ public class UserDao {
 
     public void updateUser(User user, Connection connection) throws SQLException {
         if (user.getId() == null) {
-            throw new PersistenceException("Id не может быть пустым");
+            throw new IllegalArgumentException("Id не может быть пустым");
         }
         List<String> attributes = new ArrayList<>();
         List<Object> params = new ArrayList<>();
@@ -142,6 +144,14 @@ public class UserDao {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, id);
             ps.setString(2, role.name());
+            ps.executeUpdate();
+        }
+    }
+
+    public void deleteUserById(long id, Connection connection) throws SQLException {
+        String sql = "delete from user_table where id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, id);
             ps.executeUpdate();
         }
     }

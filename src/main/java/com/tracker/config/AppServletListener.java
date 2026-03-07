@@ -14,9 +14,12 @@ public class AppServletListener implements ServletContextListener {
         try {
             Class.forName("org.postgresql.Driver");
             manager = new ApplicationManager();
-            ConnectionConfig.initDataBase(manager.getDataSource());
+            DataBaseInit.initDataBase(manager.getDataSource());
             sce.getServletContext().setAttribute("applicationManager", manager);
-            manager.startScheduler();
+            ConfigLoader configLoader = manager.getConfigLoader();
+            // Если конфиг включен,планировщик авто-закрытия задач запускается
+            if (Boolean.parseBoolean(configLoader.get("scheduler.enable")))
+                manager.startScheduler();
         } catch (Exception e) {
             throw new RuntimeException("Ошибка старта приложения", e);
         }

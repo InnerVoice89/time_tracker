@@ -15,20 +15,16 @@ public class UpdateUserServlet extends AbstractInitServlet {
 
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         User user = objectMapper.readValue(req.getReader(), User.class);
         try {
             adminService.updateUser(user);
             writeResponse(resp, "application/json", 200, Map.of("message",
-                    "Обновление пользователя прошло успешно"));
+                    "Обновление пользователя прошло успешно")
+            );
         } catch (Exception e) {
             log.warn("Ошибка обновления пользователя", e);
-            try {
-                writeResponse(resp, "application/json", 400, Map.of("error", e.getMessage()));
-            } catch (IOException io) {
-                log.error("Не удалось отправить ошибку клиенту", io);
-            }
-
+            writeResponse(resp, "application/json", 400, Map.of("error", e.getMessage()));
         }
     }
 }
