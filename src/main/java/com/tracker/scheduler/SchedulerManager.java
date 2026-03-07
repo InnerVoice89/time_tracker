@@ -36,33 +36,44 @@ public class SchedulerManager {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement checkPs = connection.prepareStatement(
-                    "select tt.id as taskId,tt.start_task,ut.timezone from task_table tt join" +
-                            " user_table ut on tt.user_id=ut.id where tt.end_task is null");
-                 PreparedStatement updatePs = connection.prepareStatement(
-                         "update task_table set end_task = ? where id = ?")) {
+                    "select tt.id as taskId,tt.start_task,ut.timezone " +
+                            "from task_table tt " +
+                            "join user_table ut on tt.user_id=ut.id " +
+                            "where tt.end_task is null");
+                 PreparedStatement updateTaskTablePs = connection.prepareStatement(
+                         "update task_table set end_task = ? where id = ?");
+                 PreparedStatement updateIntervalTablePs = connection.prepareStatement(
+                         "update time_interval_table set end_time=? where task_id=? and end_time is null")
+            ) {
                 ResultSet rs = checkPs.executeQuery();
+                Instant now = Instant.now();
                 while (rs.next()) {
-                    long id = rs.getLong("id");
+                    long taskId = rs.getLong("taskId");
                     Instant startTask = rs.getTimestamp("start_task").toInstant();
                     ZoneId userTimeZone = ZoneId.of(rs.getString("timezone"));
                     if (startTask == null)
                         throw new RuntimeException("Задача не была запущена");
-                    ZonedDateTime startWithZone = startTask.atZone(ZoneOffset.UTC)
-                            .withZoneSameInstant(userTimeZone);
-                    ZonedDateTime endOfDay = startWithZone.toLocalDate().atTime(23, 59)
-                            .atZone(userTimeZone);
+                    ZonedDateTime endOfDay = startTask
+                            .atZone(userTimeZone)
+                            .toLocalDate()
+                            .plusDays(1)
+                            .atStartOfDay(userTimeZone);
                     Instant endOfDayUtc = endOfDay.toInstant();
-                    if (Instant.now().isAfter(endOfDayUtc)) {
+                    if (now.isAfter(endOfDayUtc)) {
+                        updateTaskTablePs.setTimestamp(1, Timestamp.from(endOfDayUtc));
+                        updateTaskTablePs.setLong(2, taskId);
+                        updateTaskTablePs.addBatch();
 
-                        updatePs.setTimestamp(1, Timestamp.from(endOfDayUtc));
-                        updatePs.setLong(2, id);
-                        updatePs.addBatch();
-
+                        updateIntervalTablePs.setTimestamp(1, Timestamp.from(endOfDayUtc));
+                        updateIntervalTablePs.setLong(2, taskId);
+                        updateIntervalTablePs.addBatch();
                     }
-
                 }
-                updatePs.executeBatch();
+
+                updateTaskTablePs.executeBatch();
+                updateIntervalTablePs.executeBatch();
                 connection.commit();
+                log.info("Закрытие незавершенных задач прошло успешно");
             } catch (Exception ex) {
                 connection.rollback();
                 throw ex;

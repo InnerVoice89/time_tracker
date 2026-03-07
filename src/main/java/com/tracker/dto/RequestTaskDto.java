@@ -1,13 +1,15 @@
 package com.tracker.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class RequestTaskDto {
 
-    private long id;
+    private long userId;
     private String taskName;
 
 }

@@ -1,7 +1,6 @@
-package com.tracker.servlets.userServlets;
+package com.tracker.servlets;
 
 import com.tracker.dto.User;
-import com.tracker.servlets.AbstractInitServlet;
 import com.tracker.utils.ResponseUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,5 +1,6 @@
 package com.tracker.servlets.userServlets;
 
+import com.tracker.dto.BaseResponse;
 import com.tracker.dto.User;
 import com.tracker.servlets.AbstractInitServlet;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,19 +18,21 @@ public class CreateUserServlet extends AbstractInitServlet {
     private static final Logger log = LoggerFactory.getLogger(CreateUserServlet.class);
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             User user = objectMapper.readValue(req.getReader(), User.class);
             adminService.createUser(user);
-            writeResponse(resp, "application/json", 200, Map.of("message",
-                    "Пользователь успешно создан"));
+            writeResponse(resp, "application/json", 200,
+                    BaseResponse.builder()
+                            .success(true)
+                            .message("Пользователь успешно создан")
+                            .build());
         } catch (Exception e) {
             log.warn("Ошибка создания пользователя", e);
-            try {
-                writeResponse(resp, "application/json", 400, Map.of("error", e.getMessage()));
-            } catch (IOException io) {
-                log.error("Не удалось отправить ошибку клиенту", io);
-            }
+            writeResponse(resp, "application/json", 400, BaseResponse.builder()
+                    .success(false)
+                    .error("Ошибка создания пользователя :" + e.getMessage())
+                    .build());
         }
     }
 }
