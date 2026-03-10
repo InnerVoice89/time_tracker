@@ -4,11 +4,20 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
+/**
+ * Слушатель жизненного цикла приложения
+ */
 @WebListener
 public class AppServletListener implements ServletContextListener {
 
     private ApplicationManager manager;
 
+    /**
+     *  Запуск процессов при старте приложения :
+     *  -Инициализация контекста;
+     *  -Создание необходимых таблиц БД;
+     *  -Управление планировщиком
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
@@ -25,6 +34,11 @@ public class AppServletListener implements ServletContextListener {
         }
     }
 
+    /**
+     *Запуск процессов перед завершением приложения :
+     * -Закрывает DataSource
+     * -Останавливает Планировщик
+     */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         if (manager != null)

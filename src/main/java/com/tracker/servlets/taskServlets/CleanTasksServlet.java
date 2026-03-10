@@ -13,7 +13,7 @@ public class CleanTasksServlet extends AbstractInitServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            long userId = getPathInfo(req);
+            long userId = getPathId(req);
             log.info("Запрос на удаление задач пользователя с Id {}", userId);
             taskService.cleanAllTasksByUserId(userId);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()

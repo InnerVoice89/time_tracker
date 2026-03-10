@@ -13,7 +13,7 @@ public class PauseResumeServlet extends AbstractInitServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            long taskId = getPathInfo(req);
+            long taskId = getPathId(req);
             taskService.putPauseResume(taskId);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()
                     .success(true)

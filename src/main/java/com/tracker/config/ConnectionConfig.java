@@ -3,14 +3,19 @@ package com.tracker.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 
-@Slf4j
+
+/**
+ * Конфигурация соединения с БД
+ */
 @RequiredArgsConstructor
 public class ConnectionConfig {
 
+    /**
+     * Инициализация DataSource
+     */
     public DataSource dataSource(ConfigLoader configLoader) {
         HikariConfig config = new HikariConfig();
         config.setMaximumPoolSize(10);
@@ -24,4 +29,5 @@ public class ConnectionConfig {
         config.setPassword(configLoader.get("db.password"));
         return new HikariDataSource(config);
     }
+
 }

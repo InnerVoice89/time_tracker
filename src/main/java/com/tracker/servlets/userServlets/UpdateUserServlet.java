@@ -2,7 +2,6 @@ package com.tracker.servlets.userServlets;
 
 import com.tracker.dto.User;
 import com.tracker.servlets.AbstractInitServlet;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +17,7 @@ public class UpdateUserServlet extends AbstractInitServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         User user = objectMapper.readValue(req.getReader(), User.class);
         try {
-            adminService.updateUser(user);
+            userService.updateUser(user);
             writeResponse(resp, "application/json", 200, Map.of("message",
                     "Обновление пользователя прошло успешно")
             );

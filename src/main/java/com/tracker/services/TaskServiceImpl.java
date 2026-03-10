@@ -1,106 +1,104 @@
 package com.tracker.services;
 
 import com.tracker.UserContext;
+import com.tracker.config.TransactionManager;
 import com.tracker.dao.TaskDao;
-import com.tracker.dao.UserDao;
 import com.tracker.dto.*;
-import com.tracker.exceptions.PersistenceException;
+import com.tracker.exceptions.IllegalRequestException;
 import com.tracker.utils.TrackerUtils;
 import lombok.RequiredArgsConstructor;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
     private final TaskDao taskDao;
-    private final DataSource dataSource;
+    private final TransactionManager transactionManager;
 
     @Override
-    public long startTask(String taskName) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                long userId = UserContext.getUser().getId();
-               if(!taskDao.checkActiveTasks(userId,connection)){
-                   throw new PersistenceException("Необходимо закрыть активные задачи");
-               }
-                    RequestTaskDto taskDto = RequestTaskDto.builder()
-                            .userId(UserContext.getUser().getId())
-                            .taskName(taskName)
-                            .build();
+    public long startTask(String taskName) {
+        return transactionManager.executeInTransaction(connection -> {
 
-                long id = taskDao.createTask(taskDto, connection);
-                connection.commit();
-                return id;
-            } catch (Exception ex) {
-                connection.rollback();
-                throw ex;
+            // ID текущего пользователя берем из сессии
+            long userId = UserContext.getUser().getId();
+            if (taskDao.checkActiveTasks(userId, connection)) {
+                throw new IllegalStateException("Необходимо закрыть активные задачи");
             }
-        }
+            RequestTaskDto taskDto = RequestTaskDto.builder()
+                    .userId(userId)
+                    .taskName(taskName)
+                    .build();
+
+            return taskDao.createTask(taskDto, connection);
+        });
     }
 
     @Override
-    public void endTask(long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                taskDao.endTask(id, connection);
-                connection.commit();
-            } catch (Exception e) {
-                connection.rollback();
-                throw e;
-            }
-        }
+    public void endTask(long id) {
+        transactionManager.executeInTransaction(connection -> {
+
+            taskDao.endTask(id, connection);
+            return null;
+        });
     }
 
     @Override
-    public ShowTaskInfoRs showTasksById(long taskId) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
+    public ShowTaskInfoRs showTasksById(long taskId) {
+        return transactionManager.executeRead(connection -> {
+
             List<TaskInfo> tasks = taskDao.findInfoByTask(taskId, UserContext.getUser().getTimeZone(), connection);
             return ShowTaskInfoRs.builder()
                     .intervalTasks(tasks)
                     .totalDuration(TrackerUtils.computeDuration(tasks))
                     .build();
-        }
+        });
     }
 
     @Override
-    public ShowTaskInfoRs getTasksByUserId(long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
+    public ShowTaskInfoRs getTasksByUserId(long id) {
+        return transactionManager.executeRead(connection -> {
+
             List<TaskInfo> taskList = taskDao.findTasksByUserId(id, UserContext.getUser().getTimeZone(), connection);
             return ShowTaskInfoRs.builder()
                     .intervalTasks(taskList)
                     .totalDuration(TrackerUtils.computeDuration(taskList))
                     .build();
-        }
+        });
     }
 
+
     @Override
-    public void cleanAllTasksByUserId(long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
+    public void cleanAllTasksByUserId(long id) {
+        transactionManager.executeInTransaction(connection -> {
+
             taskDao.cleanAllTasksByUserId(id, connection);
-        }
+            return null;
+        });
     }
 
+
     @Override
-    public void deleteTaskByTaskId(long taskId) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
+    public void deleteTaskByTaskId(long taskId) {
+        transactionManager.executeInTransaction(connection -> {
+
             taskDao.deleteTaskByTaskId(taskId, connection);
-        }
+            return null;
+        });
     }
 
+
     @Override
-    public ShowTaskInfoRs findTasksInPeriod(TasksInPeriodRq request) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
+    public ShowTaskInfoRs findTasksInPeriod(TasksInPeriodRq request) {
+        return transactionManager.executeRead(connection -> {
+
+            // Проверка корректности запроса
+            validateRequest(request);
             if (request.getPeriodStart().isAfter(request.getPeriodEnd())) {
                 throw new IllegalArgumentException("Некорректный период");
             }
@@ -114,6 +112,7 @@ public class TaskServiceImpl implements TaskService {
                     UserContext.getUser().getTimeZone(), connection);
             List<TaskInfo> resultList = new ArrayList<>();
             Instant now = Instant.now();
+            // Проверка,входят ли интервалы задач в рамки запроса.Если да,то создаем объект с интервалом пересечения дат
             for (TaskInfo entity : tasks) {
 
                 Instant taskStart = entity.getStartTime().toInstant();
@@ -139,21 +138,29 @@ public class TaskServiceImpl implements TaskService {
                     .intervalTasks(resultList)
                     .totalDuration(TrackerUtils.computeDuration(resultList))
                     .build();
-        }
+        });
     }
 
+
     @Override
-    public void putPauseResume(long taskId) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                long userId = UserContext.getUser().getId();
-                taskDao.putPauseResume(taskId, userId, connection);
-                connection.commit();
-            } catch (Exception e) {
-                connection.rollback();
-                throw e;
-            }
-        }
+    public void putPauseResume(long taskId) {
+        transactionManager.executeInTransaction(connection -> {
+            long userId = UserContext.getUser().getId();
+            taskDao.putPauseResume(taskId, userId, connection);
+            return null;
+        });
     }
+
+    /**
+     * Проверка корректности запроса на получение информации по периоду
+     */
+    public void validateRequest(TasksInPeriodRq request) {
+        if (request.getUserId() == 0)
+            throw new IllegalRequestException("ID пользователя не может быть пустым");
+        if (request.getPeriodStart() == null)
+            throw new IllegalRequestException("Необходимо задать дату начала периода");
+        if (request.getPeriodEnd() == null)
+            throw new IllegalRequestException("Необходимо задать дату окончания периода");
+    }
+
 }

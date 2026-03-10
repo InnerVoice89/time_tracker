@@ -12,8 +12,17 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+/**
+ * Утилитарный класс для работы с временными интервалами задач.
+ */
 public class TrackerUtils {
-
+    /**
+     * Преобразует Duration в строковое представление.
+     * Формат результата: часы, минуты и секунды
+     *
+     * @param duration продолжительность интервала
+     * @return строковое представление продолжительности
+     */
     public static String correctDuration(Duration duration) {
         if (duration.isNegative() || duration.isZero())
             throw new RuntimeException("Некорректная продолжительность работы");
@@ -32,12 +41,21 @@ public class TrackerUtils {
 
     }
 
+    /**
+     * Конвертирует Instant в OffsetDateTime с учётом временной зоны пользователя
+     */
     public static OffsetDateTime convertInstantToOffsetDT(Instant instant, String timeZone) {
         if (timeZone == null)
             throw new IllegalArgumentException("ZoneId не должен отсутствовать");
         return instant.atZone(ZoneId.of(timeZone)).toOffsetDateTime();
     }
 
+    /**
+     * Преобразует строку ResultSet в объект TaskInfo.
+     * Метод извлекает данные задачи из результата SQL-запроса,
+     * конвертирует временные значения с учётом временной зоны пользователя
+     * и вычисляет продолжительность выполнения задачи.
+     */
     public static TaskInfo mapToTaskInfo(ResultSet rs, String timeZone) throws SQLException {
         TaskInfo taskInfo = new TaskInfo();
         taskInfo.setTaskId(rs.getLong("task_id"));
@@ -59,6 +77,11 @@ public class TrackerUtils {
         return taskInfo;
     }
 
+    /**
+     * Вычисляет суммарную продолжительность списка задач.
+     * Если задача ещё не завершена, её продолжительность считается
+     * от времени начала до текущего момента.
+     */
     public static String computeDuration(List<TaskInfo> list) {
         Instant now = Instant.now();
         Duration duration = list.stream()

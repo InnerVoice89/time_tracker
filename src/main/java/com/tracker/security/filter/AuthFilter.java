@@ -13,6 +13,17 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+/**
+ * Фильтр аутентификации и авторизации пользователя.
+ * Перехватывает все входящие HTTP-запросы и выполняет следующие проверки:
+ * -Разрешает свободный доступ к эндпоинту аутентификации {@code /auth}.
+ * -Проверяет наличие HTTP-сессии и авторизованного пользователя.
+ * -Помещает пользователя из сессии в контекст приложения для дальнейшего
+ * использования в сервисном слое.
+ * -Проверяет права доступа для административных эндпоинтов.
+ * -Если пользователь не авторизован или не имеет необходимых прав,
+ * возвращается соответствующий HTTP-код ошибки.
+ */
 @WebFilter("/*")
 public class AuthFilter implements Filter {
 
@@ -26,7 +37,7 @@ public class AuthFilter implements Filter {
             String context = request.getContextPath();
             String path = uri.substring(context.length());
             HttpSession session = request.getSession(false);
-
+            // Свободный доступ к сервису аутентификации
             if (path.equals("/auth")) {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
@@ -36,8 +47,8 @@ public class AuthFilter implements Filter {
                 ResponseUtils.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Ошибка доступа");
                 return;
             }
+            // Извлекаем из сессии пользователя и добавляем в контекст приложения для дальнейшего использования
             User user = (User) session.getAttribute("user");
-
             UserContext.setUser(user);
             if (path.startsWith("/api/admin") && !Role.has(Role.ADMIN, user.getRoles())) {
                 ResponseUtils.errorResponse(response, HttpServletResponse.SC_FORBIDDEN,
