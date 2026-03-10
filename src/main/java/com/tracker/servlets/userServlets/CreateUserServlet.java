@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 
 @WebServlet("/api/admin/create-user")
 public class CreateUserServlet extends AbstractInitServlet {
@@ -21,7 +20,7 @@ public class CreateUserServlet extends AbstractInitServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             User user = objectMapper.readValue(req.getReader(), User.class);
-            adminService.createUser(user);
+            userService.createUser(user);
             writeResponse(resp, "application/json", 200,
                     BaseResponse.builder()
                             .success(true)

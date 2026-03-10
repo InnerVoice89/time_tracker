@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Класс
+ */
 public class UserDao {
 
     public User findUserByUsername(String username, Connection connection) throws SQLException {

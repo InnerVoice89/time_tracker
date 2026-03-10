@@ -17,7 +17,7 @@ public class DeleteSpecTaskServlet extends AbstractInitServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         try {
-            long taskId = getPathInfo(req);
+            long taskId = getPathId(req);
             log.info("Запрос на удаление задачи {}", taskId);
             taskService.deleteTaskByTaskId(taskId);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()

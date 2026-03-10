@@ -6,8 +6,13 @@ import com.tracker.security.PasswordEncoder;
 import javax.sql.DataSource;
 import java.sql.*;
 
+/**
+ * Класс инициализации БД
+ */
 public class DataBaseInit {
-
+    /**
+     * Создание необходимых таблиц и тестового администратора с username = 'admin';password = 'admin'
+     */
     public static void initDataBase(DataSource dataSource) throws SQLException {
         String createTaskTableSQL = "create table if not exists task_table (" +
                 "id bigint primary key generated always as identity," +
@@ -45,6 +50,12 @@ public class DataBaseInit {
                 "REFERENCES task_table(id) " +
                 "on delete cascade)";
 
+// Создание индекса уникальности null значения поля end_time таблицы time_interval_table для предотвращения race_condition
+        String indexUniqueNullSql = "create unique index one_active_task_per_user " +
+                "ON time_interval_table(task_id) " +
+                "WHERE end_time IS NULL";
+
+        // Создается администратор
         String password = PasswordEncoder.hash("admin");
         String createAdminSQL = "insert into user_table(username,password,timezone) values(?,?,?) " +
                 "on conflict(username) do update set username=excluded.username RETURNING id";
@@ -61,6 +72,7 @@ public class DataBaseInit {
                 st.execute(createTaskTableSQL);
                 st.execute(createUserRolesSQL);
                 st.execute(createTimeIntervalTable);
+                st.execute(indexUniqueNullSql);
 
 
                 createAdminPs.setString(1, "admin");

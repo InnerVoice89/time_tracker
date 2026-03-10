@@ -14,9 +14,9 @@ public class DeleteUserServlet extends AbstractInitServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            long id = getPathInfo(req);
+            long id = getPathId(req);
             log.info("Удаление пользователя с ID {}", id);
-            adminService.deleteUser(id);
+            userService.deleteUser(id);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()
                     .success(true)
                     .build()

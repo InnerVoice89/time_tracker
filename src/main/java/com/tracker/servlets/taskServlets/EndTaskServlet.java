@@ -16,7 +16,7 @@ public class EndTaskServlet extends AbstractInitServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            long id= getPathInfo(req);
+            long id= getPathId(req);
             log.info("Получение запроса на завершение задачи с Id - {}", id);
             taskService.endTask(id);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()

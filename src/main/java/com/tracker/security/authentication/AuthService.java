@@ -9,16 +9,22 @@ import lombok.RequiredArgsConstructor;
 
 import java.sql.SQLException;
 
+/**
+ *  Сервис аутентификации пользователя
+ */
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserService userService;
 
+    /**
+     * Сверка полученных данных от пользователя
+     */
     public User authenticate(String username, String password) throws SQLException {
 
         User user = userService.findUserByUsername(username);
         if (user == null)
-            throw new RuntimeException("Пользователь не найден");
+            throw new SecurityException("Пользователь не найден");
         if (!PasswordEncoder.matches(password, user.getPassword()))
             throw new SecurityException("Пароли не совпадают");
         user.setPassword(null);
