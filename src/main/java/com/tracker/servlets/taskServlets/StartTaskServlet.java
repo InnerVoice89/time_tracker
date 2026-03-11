@@ -10,7 +10,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet("/api/start")
+/**
+ * Сервлет для создания новой задачи
+ * Принимает в запросе параметр:
+ * POST /api/task/start?taskName=name
+ * Возвращает идентификатор созданной задачи
+ */
+@WebServlet("/api/task/start")
 public class StartTaskServlet extends AbstractInitServlet {
 
     @Override

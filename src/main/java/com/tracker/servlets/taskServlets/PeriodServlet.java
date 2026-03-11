@@ -9,7 +9,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-
+/**
+ * Сервлет для получения информации о задачах пользователя за определенный период.
+ * Метод POST принимает JSON с параметрами:
+ * {
+ *   "userId": 1,
+ *   "periodStart": "2025-02-01T00:00:00",
+ *   "periodEnd": "2025-05-04T00:00:00"
+ * }
+ * Возвращает JSON с результатом:
+ * {
+ *   "success": true,
+ *   "data": {
+ *       "intervalTasks": [...],
+ *       "totalDuration": "12 ч. 30 m. 0 sec."
+ *   }
+ * }
+ * В случае ошибки возвращает JSON с полем <code>error</code>.
+ */
 @WebServlet("/api/admin/period")
 public class PeriodServlet extends AbstractInitServlet {
     @Override

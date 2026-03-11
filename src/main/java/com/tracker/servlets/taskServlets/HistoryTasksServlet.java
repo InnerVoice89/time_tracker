@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет для получения информации обо всех задачах пользователя
+ */
 @WebServlet("/api/admin/tasks/history/*")
 public class HistoryTasksServlet extends AbstractInitServlet {
 
@@ -16,9 +19,9 @@ public class HistoryTasksServlet extends AbstractInitServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         try {
-            long id = getPathId(req);
-            log.info("Получение списка задач пользователя с ID {}", id);
-            ShowTaskInfoRs taskList = taskService.getTasksByUserId(id);
+            long userId = getPathId(req);
+            log.info("Получение списка задач пользователя с ID {}", userId);
+            ShowTaskInfoRs taskList = taskService.getTasksByUserId(userId);
             writeResponse(resp, "application/json", 200, BaseResponse.builder()
                     .success(true)
                     .data(taskList)

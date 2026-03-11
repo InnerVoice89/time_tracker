@@ -1,17 +1,17 @@
 package com.tracker.servlets.taskServlets;
 
-import com.beust.jcommander.ParameterException;
 import com.tracker.dto.BaseResponse;
-import com.tracker.exceptions.IllegalRequestException;
 import com.tracker.servlets.AbstractInitServlet;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/api/stop/*")
+/**
+ * Сервлет для завершения задачи
+ */
+@WebServlet("/api/task/stop/*")
 public class EndTaskServlet extends AbstractInitServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {

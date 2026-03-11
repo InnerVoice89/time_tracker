@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-
+/**
+ * Сервлет для получения информации о задаче по идентификатору
+ */
 @WebServlet("/api/admin/task/*")
 public class GetTaskServlet extends AbstractInitServlet {
     @Override

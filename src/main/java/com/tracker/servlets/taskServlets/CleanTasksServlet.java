@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет для удаления всех задач пользователя
+ */
 @WebServlet("/api/admin/clean/*")
 public class CleanTasksServlet extends AbstractInitServlet {
     @Override
