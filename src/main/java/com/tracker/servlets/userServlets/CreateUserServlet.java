@@ -11,6 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+/**
+ * Сервлет создания нового пользователя
+ * Принимает в теле POST запроса:
+ * {
+ * "username":"user",
+ * "password":"user123",
+ * "timeZone":"Europe/Moscow",
+ * "roles":[
+ * "USER"
+ * ]
+ * }
+ */
 @WebServlet("/api/admin/create-user")
 public class CreateUserServlet extends AbstractInitServlet {
 

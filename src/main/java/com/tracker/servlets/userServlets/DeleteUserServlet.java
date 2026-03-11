@@ -9,10 +9,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет удаления пользователя
+ */
 @WebServlet("/api/admin/delete-user/*")
 public class DeleteUserServlet extends AbstractInitServlet {
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             long id = getPathId(req);
             log.info("Удаление пользователя с ID {}", id);

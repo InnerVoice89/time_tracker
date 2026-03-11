@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс доступа к данным по задачам
+ * DAO-класс доступа к данным по задачам
  */
 public class TaskDao {
 
@@ -23,7 +23,6 @@ public class TaskDao {
      * @param request Название задачи и ID текущего пользователя
      * @return id созданной задачи
      */
-
     public long createTask(RequestTaskDto request, Connection connection) {
         // Cоздание задачи
         String insertTaskTable = "insert into task_table " +
@@ -59,9 +58,8 @@ public class TaskDao {
     }
 
     /**
-     * Завершение задачи
+     * Завершение задачи по идентификатору
      */
-
     public void endTask(long id, Connection connection) {
         try (PreparedStatement commonEndPs = connection.prepareStatement("update task_table " +
                 "set end_task=? where id=?");
@@ -89,7 +87,6 @@ public class TaskDao {
      * @param timeZone временная зона администратора,берется из сессии
      * @return список временных интервалов по данной задаче
      */
-
     public List<TaskInfo> findInfoByTask(long taskId, String timeZone, Connection connection) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "select * from time_interval_table tit " +
@@ -110,9 +107,9 @@ public class TaskDao {
 
     /**
      * Поиск информации по всем задачам пользователя
+     *
      * @param timeZone временная зона администратора
      */
-
     public List<TaskInfo> findTasksByUserId(long id, String timeZone, Connection connection) {
         String sql = "select tit.start_time,tit.end_time,tit.task_id,tt.task_name,user_id " +
                 "from time_interval_table tit " +

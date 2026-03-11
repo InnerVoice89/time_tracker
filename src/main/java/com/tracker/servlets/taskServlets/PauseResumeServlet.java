@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/api/pause/*")
+/**
+ * Сервлет для постановки на паузу/возобновление задачи
+ */
+@WebServlet("/api/task/pause/*")
 public class PauseResumeServlet extends AbstractInitServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {

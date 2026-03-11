@@ -9,6 +9,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Сервлет изменения существующего пользователя
+ * В теле опционально передаем изменяемые данные:
+ * {
+ *  * "username":"user",
+ *  * "password":"user123",
+ *  * "timeZone":"Europe/Moscow",
+ *  * "roles":[
+ *  * "USER"
+ *  * ]
+ *  * }
+ */
 @WebServlet("/api/admin/update-user")
 public class UpdateUserServlet extends AbstractInitServlet {
 

@@ -78,10 +78,11 @@ public class TaskAutoCloseScheduler {
                             .atStartOfDay(userTimeZone);
                     Instant endOfDayUtc = endOfDay.toInstant();
                     if (now.isAfter(endOfDayUtc)) {
+                        // Если задача не завершилась в течении дня,закрываем задачу...
                         updateTaskTablePs.setTimestamp(1, Timestamp.from(endOfDayUtc));
                         updateTaskTablePs.setLong(2, taskId);
                         updateTaskTablePs.addBatch();
-
+                        //...и закрываем интервалы
                         updateIntervalTablePs.setTimestamp(1, Timestamp.from(endOfDayUtc));
                         updateIntervalTablePs.setLong(2, taskId);
                         updateIntervalTablePs.addBatch();

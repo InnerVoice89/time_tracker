@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Сервлет для удаления задачи по идентификатору
+ */
 @WebServlet("/api/admin/delete-task/*")
 public class DeleteSpecTaskServlet extends AbstractInitServlet {
 
