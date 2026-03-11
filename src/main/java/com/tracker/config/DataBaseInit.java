@@ -51,7 +51,7 @@ public class DataBaseInit {
                 "on delete cascade)";
 
 // Создание индекса уникальности null значения поля end_time таблицы time_interval_table для предотвращения race_condition
-        String indexUniqueNullSql = "create unique index one_active_task_per_user " +
+        String indexUniqueNullSql = "create unique index if not exists one_active_task_per_user " +
                 "ON time_interval_table(task_id) " +
                 "WHERE end_time IS NULL";
 
